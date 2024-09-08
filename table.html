@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multiplication Quiz</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #e0f7fa;
+        }
+
+        .container {
+            background-color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        h1 {
+            color: #00796b;
+            margin-bottom: 20px;
+        }
+
+        p {
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        input {
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #00796b;
+            border-radius: 5px;
+            width: 100px;
+            margin-bottom: 15px;
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background: linear-gradient(45deg, #00796b, #004d40);
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.3s;
+        }
+
+        button:hover {
+            background: linear-gradient(45deg, #004d40, #00796b);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        #feedback {
+            font-size: 18px;
+            margin-top: 15px;
+        }
+
+        .correct {
+            color: green;
+        }
+
+        .incorrect {
+            color: red;
+        }
+
+        .streak {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 20px;
+            background-color: #00796b;
+            color: white;
+            padding: 10px;
+            border-radius: 50px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .streak img {
+            width: 30px;
+            height: 30px;
+        }
+
+        /* Counter display at the top left */
+        .counter-container {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .counter-container button {
+            width: 30px;
+            height: 30px;
+            font-size: 14px;
+            background: linear-gradient(45deg, #00796b, #004d40);
+            color: white;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0; /* Remove unwanted padding */
+            transition: transform 0.2s, background 0.3s;
+        }
+
+        .counter-container button:hover {
+            background: linear-gradient(45deg, #004d40, #00796b);
+        }
+
+        .counter-container button:active {
+            transform: scale(0.95);
+        }
+
+        .counter-container div {
+            width: 40px;
+            height: 30px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: white;
+            color: #00796b;
+            font-weight: bold;
+            border: 2px solid #00796b;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Multiplication Quiz</h1>
+        <div id="quiz">
+            <p id="question"></p>
+            <input type="number" id="answer" placeholder="Your answer" />
+            <br>
+            <button onclick="checkAnswer()">Submit</button>
+        </div>
+        <p id="feedback"></p>
+    </div>
+
+    <div class="streak" id="streakDisplay">
+        <img src="https://img.icons8.com/color/48/000000/trophy.png" alt="Trophy">
+        <span id="streakCount">0</span>
+    </div>
+
+    <!-- Counter at the top left -->
+    <div class="counter-container">
+        <button onclick="changeCounter(-1)">-</button>
+        <div id="counter">10</div>
+        <button onclick="changeCounter(1)">+</button>
+    </div>
+
+    <script>
+        let num1, num2;
+        let streak = 0;
+        let counter = 10; // Default value of the counter
+
+        // Function to generate multiplication question
+        function generateQuestion() {
+            num1 = Math.floor(Math.random() * counter) + 1;
+            num2 = Math.floor(Math.random() * counter) + 1;
+            document.getElementById('question').innerText = `${num1} × ${num2} = ?`;
+            document.getElementById('answer').value = '';
+            document.getElementById('feedback').innerText = '';
+        }
+
+        // Function to check user's answer
+        function checkAnswer() {
+            const userAnswer = document.getElementById('answer').value;
+            const feedback = document.getElementById('feedback');
+            const streakDisplay = document.getElementById('streakCount');
+            
+            if (userAnswer == num1 * num2) {
+                feedback.innerText = 'Correct!';
+                feedback.className = 'correct';
+                streak++; // Increase streak on correct answer
+                streakDisplay.innerText = streak; // Update streak display
+                setTimeout(generateQuestion, 1000); // Generate new question after 1 second
+            } else {
+                feedback.innerText = 'Incorrect, try again.';
+                feedback.className = 'incorrect';
+                streak = 0; // Reset streak on incorrect answer
+                streakDisplay.innerText = streak; // Reset streak display
+            }
+        }
+
+        // Function to change the counter value
+        function changeCounter(change) {
+            counter = Math.min(Math.max(counter + change, 1), 100); // Counter between 1 and 100
+            document.getElementById('counter').innerText = counter;
+            localStorage.setItem('counter', counter); // Save the counter value to localStorage
+            generateQuestion(); // Generate new question based on updated counter
+        }
+
+        // Initialize the first question when the page loads
+        function initialize() {
+            const storedCounter = localStorage.getItem('counter');
+            if (storedCounter) {
+                counter = parseInt(storedCounter);
+            } else {
+                localStorage.setItem('counter', counter); // Save default value if no previous one exists
+            }
+            document.getElementById('counter').innerText = counter;
+            generateQuestion();
+        }
+
+        // Initialize on page load
+        initialize();
+    </script>
+
+</body>
+</html>
